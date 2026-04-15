@@ -1,7 +1,23 @@
-# Использование
+<div align="center" style="margin: 20px 0; padding: 10px; background: #1c1917; border-radius: 10px;">
+  <strong>🌐 Language: </strong>
+  
+  <a href="./COMMANDS.ru.md" style="color: #F5F752; margin: 0 10px;">
+    🇷🇺 Russian
+  </a>
+  | 
+  <span style="color: #0891b2; margin: 0 10px;">
+    ✅ 🇺🇸 English (current)
+  </span>
+</div>
 
-- [Использование](#использование)
-- [Команды `ytMSE`](#команды-ytmse)
+- [Back to main](../README.md)
+
+---
+
+# Usage
+
+- [Usage](#usage)
+- [Commands `ytMSE`](#commands-ytmse)
   - [`ytMSE.list()`](#ytmselist)
   - [`ytMSE.inspect()`](#ytmseinspect)
   - [`ytMSE.inspect(id)`](#ytmseinspectid)
@@ -11,7 +27,7 @@
   - [`ytMSE.clear()`](#ytmseclear)
   - [`ytMSE.getMeta()`](#ytmsegetmeta)
   - [`ytMSE.playerInfo()`](#ytmseplayerinfo)
-- [Команды `ytAuto`](#команды-ytauto)
+- [Commands `ytAuto`](#commands-ytauto)
   - [`ytAuto.start()`](#ytautostart)
   - [`ytAuto.start(1500)`](#ytautostart1500)
   - [`ytAuto.stop()`](#ytautostop)
@@ -20,17 +36,17 @@
   - [`ytAuto.saveNow()`](#ytautosavenow)
   - [`ytAuto.setMinBytes(bytes)`](#ytautosetminbytesbytes)
 
-# Команды `ytMSE`
+# Commands `ytMSE`
 
 ## `ytMSE.list()`
 
-Показывает все собранные сессии.
+Displays all collected sessions.
 
 ```js
 ytMSE.list()
 ```
 
-Пример того, что вернётся:
+Example output:
 
 ```js
 ;[
@@ -51,7 +67,7 @@ ytMSE.list()
 
 ## `ytMSE.inspect()`
 
-Показывает **последнюю аудио-сессию** полностью.
+Displays the **latest audio session** in full.
 
 ```js
 ytMSE.inspect()
@@ -61,7 +77,7 @@ ytMSE.inspect()
 
 ## `ytMSE.inspect(id)`
 
-Показывает конкретную сессию по ID.
+Displays a specific session by ID.
 
 ```js
 ytMSE.inspect(0)
@@ -71,7 +87,7 @@ ytMSE.inspect(0)
 
 ## `ytMSE.save()`
 
-Сохраняет **лучшую завершённую предыдущую** сессию, а если её нет — последнюю актуальную.
+Saves the **best completed previous session**, or the latest one if none exists.
 
 ```js
 ytMSE.save()
@@ -81,7 +97,7 @@ ytMSE.save()
 
 ## `ytMSE.save(id)`
 
-Сохраняет конкретную сессию по ID.
+Saves a specific session by ID.
 
 ```js
 ytMSE.save(0)
@@ -91,7 +107,7 @@ ytMSE.save(0)
 
 ## `ytMSE.save(id, filename)`
 
-Сохраняет конкретную сессию под своим именем файла.
+Saves a specific session with a custom filename.
 
 ```js
 ytMSE.save(0, 'my_track.webm')
@@ -101,7 +117,7 @@ ytMSE.save(0, 'my_track.webm')
 
 ## `ytMSE.clear()`
 
-Очищает все накопленные сессии и сбрасывает внутреннее состояние.
+Clears all collected sessions and resets internal state.
 
 ```js
 ytMSE.clear()
@@ -111,13 +127,13 @@ ytMSE.clear()
 
 ## `ytMSE.getMeta()`
 
-Возвращает текущую мету трека из player bar.
+Returns current track metadata from the player bar.
 
 ```js
 ytMSE.getMeta()
 ```
 
-Пример:
+Example:
 
 ```js
 {
@@ -134,7 +150,7 @@ ytMSE.getMeta()
 
 ## `ytMSE.playerInfo()`
 
-Возвращает техническую инфу по `<audio>`:
+Returns technical `<audio>` info:
 
 - `currentTime`
 - `duration`
@@ -148,11 +164,11 @@ ytMSE.playerInfo()
 
 ---
 
-# Команды `ytAuto`
+# Commands `ytAuto`
 
 ## `ytAuto.start()`
 
-Запускает авто-режим с дефолтным интервалом.
+Starts auto mode with default interval.
 
 ```js
 ytAuto.start()
@@ -162,7 +178,7 @@ ytAuto.start()
 
 ## `ytAuto.start(1500)`
 
-Запускает авто-режим с кастомным интервалом проверки.
+Starts auto mode with custom polling interval.
 
 ```js
 ytAuto.start(1500)
@@ -172,7 +188,7 @@ ytAuto.start(1500)
 
 ## `ytAuto.stop()`
 
-Останавливает авто-режим и по умолчанию пытается сохранить последний кандидат.
+Stops auto mode and attempts to save the last candidate by default.
 
 ```js
 ytAuto.stop()
@@ -182,7 +198,7 @@ ytAuto.stop()
 
 ## `ytAuto.stop(false)`
 
-Останавливает авто-режим **без финального сохранения**.
+Stops auto mode **without final save**.
 
 ```js
 ytAuto.stop(false)
@@ -192,15 +208,15 @@ ytAuto.stop(false)
 
 ## `ytAuto.status()`
 
-Показывает текущее состояние авто-системы:
+Shows current auto-system state:
 
-- работает ли авто-режим
-- текущий stableKey
-- pendingKey
-- pendingCount
-- minBytesToSave
-- список сессий
-- текущую мету
+- whether auto mode is running
+- current `stableKey`
+- `pendingKey`
+- `pendingCount`
+- `minBytesToSave`
+- session list
+- current metadata
 
 ```js
 ytAuto.status()
@@ -210,7 +226,7 @@ ytAuto.status()
 
 ## `ytAuto.saveNow()`
 
-Принудительно сохранить лучший доступный кандидат прямо сейчас.
+Force-save the best available session immediately.
 
 ```js
 ytAuto.saveNow()
@@ -220,13 +236,13 @@ ytAuto.saveNow()
 
 ## `ytAuto.setMinBytes(bytes)`
 
-Меняет минимальный размер сессии, при котором её можно сохранять.
+Sets minimum session size required for saving.
 
 ```js
 ytAuto.setMinBytes(300000)
 ```
 
-Например:
+Example:
 
 ```js
 ytAuto.setMinBytes(500000)

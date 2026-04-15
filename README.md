@@ -1,4 +1,4 @@
-# YouTube Music MSE Audio Dumper Toolkit (Chrome DevTools)
+<h1 align="center">YouTube Music MSE Audio Dumper Toolkit (Chrome DevTools)</h1>
 
 <p align="center">
   <img src="https://shields.dvurechensky.pro/badge/Chrome-DevTools-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white" />
@@ -8,290 +8,211 @@
   <img src="https://shields.dvurechensky.pro/badge/Status-Experimental-yellow?style=for-the-badge" />
 </p>
 
-> Минималистичный DevTools-инструмент для перехвата аудио-чанков из **YouTube Music** через **MediaSource / SourceBuffer**, просмотра активных сессий, авто-сохранения треков при переключении и дебага текущего проигрывателя.
+<div align="center" style="margin: 20px 0; padding: 10px; background: #1c1917; border-radius: 10px;">
+  <strong>🌐 Language: </strong>
+  
+  <a href="./README.ru.md" style="color: #F5F752; margin: 0 10px;">
+    🇷🇺 Russian
+  </a>
+  | 
+  <span style="color: #0891b2; margin: 0 10px;">
+    ✅ 🇺🇸 English (current)
+  </span>
+</div>
+
+---
+
+> A minimalist DevTools toolkit for intercepting audio chunks from **YouTube Music** via **MediaSource / SourceBuffer**, inspecting active sessions, auto-saving tracks on switch, and debugging the current player.
 
 ---
 
 > [!WARNING]
-> Этот toolkit работает за счёт **runtime-hook'ов браузера** и зависит от текущей реализации **YouTube Music**.  
-> Если Google изменит DOM, MSE-пайплайн, структуру плеера или способ буферизации — часть логики может потребовать правки.
+> This toolkit works via **browser runtime hooks** and depends on the current implementation of **YouTube Music**.  
+> If Google changes the DOM, MSE pipeline, player structure, or buffering logic — parts of the code may require updates.
 
 > [!NOTE]
-> Это не расширение и не отдельное приложение.  
-> Toolkit запускается **прямо в Chrome DevTools Console** и работает **внутри текущей вкладки YouTube Music**.
+> This is not an extension or standalone application.  
+> The toolkit runs **directly inside Chrome DevTools Console** and works **within the current YouTube Music tab**.
 
 > [!IMPORTANT]
-> Инструмент задуман как **технический DevTools toolkit для исследования и анализа воспроизведения**, а не как polished end-user продукт с интерфейсом "на одну кнопку".
+> This tool is designed as a **technical DevTools toolkit for analysis and research**, not as a polished one-click end-user product.
 
 ---
 
-- [YouTube Music MSE Audio Dumper Toolkit (Chrome DevTools)](#youtube-music-mse-audio-dumper-toolkit-chrome-devtools)
-  - [Зачем я это сделал](#зачем-я-это-сделал)
-- [Что умеет этот toolkit](#что-умеет-этот-toolkit)
-  - [Основные возможности](#основные-возможности)
-    - [1) Перехват MSE аудио-потока](#1-перехват-mse-аудио-потока)
-    - [2) Автоматическое создание "сессий"](#2-автоматическое-создание-сессий)
-    - [3) Чистое получение меты трека](#3-чистое-получение-меты-трека)
-    - [4) Ручное сохранение перехваченного аудио](#4-ручное-сохранение-перехваченного-аудио)
-    - [5) Авто-сохранение при переключении треков](#5-авто-сохранение-при-переключении-треков)
-    - [6) Инспекция и дебаг](#6-инспекция-и-дебаг)
-- [Как это работает](#как-это-работает)
-  - [Архитектура](#архитектура)
-    - [Хук на `MediaSource.addSourceBuffer`](#хук-на-mediasourceaddsourcebuffer)
-    - [Хук на `SourceBuffer.appendBuffer`](#хук-на-sourcebufferappendbuffer)
-    - [Логика "track change"](#логика-track-change)
-- [Установка / запуск](#установка--запуск)
-  - [Вариант: через Chrome DevTools](#вариант-через-chrome-devtools)
-    - [1. Открываю YouTube Music](#1-открываю-youtube-music)
-    - [2. Открываю DevTools](#2-открываю-devtools)
-    - [3. Иду в Console](#3-иду-в-console)
-    - [4. Вставляю весь toolkit-код](#4-вставляю-весь-toolkit-код)
-- [Типичный сценарий использования](#типичный-сценарий-использования)
-  - [Сценарий 1 — вручную](#сценарий-1--вручную)
-  - [Сценарий 2 — авто-сбор треков](#сценарий-2--авто-сбор-треков)
-  - [Сценарий 3 — отладка](#сценарий-3--отладка)
-- [Почему это полезно](#почему-это-полезно)
-  - [Преимущества такого подхода](#преимущества-такого-подхода)
-    - [Не нужен MITM / прокси](#не-нужен-mitm--прокси)
-    - [Работаю прямо на уровне плеера](#работаю-прямо-на-уровне-плеера)
-    - [Минимум внешних зависимостей](#минимум-внешних-зависимостей)
-    - [Удобно для исследования YouTube Music](#удобно-для-исследования-youtube-music)
-- [Ограничения](#ограничения)
-  - [1) Это не "магический универсальный загрузчик"](#1-это-не-магический-универсальный-загрузчик)
-  - [2) Возможны дубли / лишние сессии](#2-возможны-дубли--лишние-сессии)
-  - [3) Это инструмент для технического исследования](#3-это-инструмент-для-технического-исследования)
+- [What this toolkit can do](#what-this-toolkit-can-do)
+  - [Core features](#core-features)
+    - [1) Intercepting MSE audio stream](#1-intercepting-mse-audio-stream)
+    - [2) Automatic session creation](#2-automatic-session-creation)
+    - [3) Clean track metadata extraction](#3-clean-track-metadata-extraction)
+    - [4) Manual audio saving](#4-manual-audio-saving)
+    - [5) Auto-save on track switch](#5-auto-save-on-track-switch)
+    - [6) Inspection and debugging](#6-inspection-and-debugging)
+- [How it works](#how-it-works)
+  - [Architecture](#architecture)
+    - [Hooking `MediaSource.addSourceBuffer`](#hooking-mediasourceaddsourcebuffer)
+    - [Hooking `SourceBuffer.appendBuffer`](#hooking-sourcebufferappendbuffer)
+    - [Track change logic](#track-change-logic)
+- [Installation / launch](#installation--launch)
+  - [Option: via Chrome DevTools](#option-via-chrome-devtools)
+- [Typical usage scenarios](#typical-usage-scenarios)
+- [Why this is useful](#why-this-is-useful)
+- [Limitations](#limitations)
 - [Dev Notes](#dev-notes)
-  - [Почему я замораживаю meta при создании session](#почему-я-замораживаю-meta-при-создании-session)
-  - [Почему я сохраняю не "самую новую" session, а "лучшую предыдущую"](#почему-я-сохраняю-не-самую-новую-session-а-лучшую-предыдущую)
-  - [Почему тут нет UI](#почему-тут-нет-ui)
 - [Troubleshooting](#troubleshooting)
-  - [Не появляется `[YT] Clean toolkit v3 installed.`](#не-появляется-yt-clean-toolkit-v3-installed)
-  - [`ytMSE.list()` пустой](#ytmselist-пустой)
-  - [Сохраняется слишком маленький / битый файл](#сохраняется-слишком-маленький--битый-файл)
-  - [Автосохранение срабатывает не так, как ожидается](#автосохранение-срабатывает-не-так-как-ожидается)
-  - [В имени файла не тот артист / не тот трек](#в-имени-файла-не-тот-артист--не-тот-трек)
-- [Дальнейшие идеи развития](#дальнейшие-идеи-развития)
-- [Быстрый старт](#быстрый-старт)
+- [Future ideas](#future-ideas)
+- [Quick start](#quick-start)
 - [Disclaimer](#disclaimer)
 
 ---
 
-## Зачем я это сделал
+## Why I built this
 
-Я хотел получить **прямой технический контроль** над тем, что реально прилетает в браузер при проигрывании музыки в **YouTube Music**.
+I wanted **direct technical control** over what actually arrives in the browser when playing music on **YouTube Music**.
 
-Не через расширения, не через мутные "загрузчики", не через внешний MITM или сетевые пляски, а **изнутри самой вкладки**, на уровне того, как сайт кормит аудио в `<audio>` через **MSE (Media Source Extensions)**.
+Not through extensions, not through sketchy downloaders, not via MITM tricks — but **inside the tab itself**, at the level of how the site feeds audio into `<audio>` via **MSE (Media Source Extensions)**.
 
-Идея была простой:
+The idea was simple:
 
-- зацепиться за `MediaSource.prototype.addSourceBuffer`
-- перехватывать `appendBuffer()`
-- собирать все аудио-чанки в память
-- привязывать их к конкретному треку
-- и при необходимости **сохранять всё это как файл**
+- hook into `MediaSource.prototype.addSourceBuffer`
+- intercept `appendBuffer()`
+- collect all audio chunks
+- bind them to a track
+- and optionally **save them as a file**
 
-В итоге получился **чистый DevTools toolkit**, который можно просто вставить в **Chrome DevTools Console** на странице **YouTube Music** и сразу использовать.
+The result is a **clean DevTools toolkit** that you can paste into Chrome DevTools Console and immediately use.
 
 ---
 
-# Что умеет этот toolkit
+# What this toolkit can do
 
-## Основные возможности
+## Core features
 
-### 1) Перехват MSE аудио-потока
+### 1) Intercepting MSE audio stream
 
-Я хукаю:
+Hooks:
 
 - `MediaSource.prototype.addSourceBuffer`
 - `SourceBuffer.appendBuffer()`
 
-И собираю **все аудио-чанки**, которые YouTube Music скармливает плееру.
+Collects all audio chunks fed into the player.
 
 ---
 
-### 2) Автоматическое создание "сессий"
+### 2) Automatic session creation
 
-Каждый новый `SourceBuffer` создаёт отдельную **session**, в которой хранится:
+Each `SourceBuffer` creates a session:
 
 - `id`
 - `mime`
 - `createdAt`
-- замороженная `meta` на момент создания
-- массив `chunks`
-- суммарный размер `totalBytes`
-- флаг `saved`
-
-То есть каждая сессия — это отдельный контейнер с перехваченным аудио.
+- frozen `meta`
+- `chunks`
+- `totalBytes`
+- `saved`
 
 ---
 
-### 3) Чистое получение меты трека
+### 3) Clean track metadata extraction
 
-Я отдельно сделал сбор **названия** и **артиста** именно из **YouTube Music player bar**, а не из SEO-мусора страницы.
+Extracts:
 
-Инструмент тянет:
+- title
+- artist
+- currentSrc
+- currentTime
+- duration
+- paused
 
-- **title**
-- **artist**
-- `audio.currentSrc`
-- `currentTime`
-- `duration`
-- `paused`
+Avoids:
 
-Причём специально избегается мусор вроде:
-
-- просмотров
-- лайков
-- SEO-заголовков
-- лишней byline-инфы
+- SEO garbage
+- likes/views
+- noisy byline data
 
 ---
 
-### 4) Ручное сохранение перехваченного аудио
+### 4) Manual audio saving
 
-Можно в любой момент сохранить:
+You can save:
 
-- **самую актуальную аудио-сессию**
-- или **предыдущую завершённую**
-- или **конкретную по ID**
-
-Toolkit сам соберёт Blob и отдаст скачивание через браузер.
+- latest session
+- previous session
+- specific session by ID
 
 ---
 
-### 5) Авто-сохранение при переключении треков
+### 5) Auto-save on track switch
 
-Это одна из самых полезных частей.
+`ytAuto`:
 
-Я добавил отдельный `ytAuto`, который:
-
-- отслеживает текущий трек
-- понимает, когда реально произошла **смена композиции**
-- не реагирует на случайные дрожания DOM
-- ждёт стабильного подтверждения
-- и только потом **сохраняет предыдущую завершённую аудио-сессию**
-
-Это позволяет просто включить плейлист / радио / автоподбор и дать инструменту самому собирать треки по мере проигрывания.
+- tracks current song
+- detects real track changes
+- ignores DOM flicker
+- confirms stable change
+- saves previous session
 
 ---
 
-### 6) Инспекция и дебаг
+### 6) Inspection and debugging
 
-Можно посмотреть:
+Inspect:
 
-- список всех сессий
-- содержимое конкретной сессии
-- состояние `<audio>`
-- buffered ranges
-- текущий src
-- текущую мету
-
-То есть это не просто "дампер", а ещё и **удобный диагностический инструмент**.
+- sessions
+- buffers
+- player state
+- metadata
 
 ---
 
-# Как это работает
+# How it works
 
-## Архитектура
+## Architecture
 
-### Хук на `MediaSource.addSourceBuffer`
+### Hooking `MediaSource.addSourceBuffer`
 
-Когда YouTube Music создаёт новый `SourceBuffer`, я:
-
-1. вызываю оригинальный `addSourceBuffer`
-2. создаю новую `session`
-3. замораживаю мету трека на этот момент
-4. подменяю `appendBuffer`
+- call original
+- create session
+- freeze meta
+- patch appendBuffer
 
 ---
 
-### Хук на `SourceBuffer.appendBuffer`
+### Hooking `SourceBuffer.appendBuffer`
 
-Каждый раз, когда YouTube Music докидывает очередной аудио-фрагмент:
-
-- я копирую входной `ArrayBuffer` / `TypedArray`
-- сохраняю chunk в `session.chunks`
-- увеличиваю `session.totalBytes`
-
-Таким образом в памяти постепенно собирается весь аудио-поток.
+- copy buffer
+- push into session
+- increase total size
 
 ---
 
-### Логика "track change"
+### Track change logic
 
-Автоматическое сохранение не триггерится тупо по одному изменению текста на странице.
-
-Я сделал защиту от ложных срабатываний:
-
-- вычисляется `trackKey`
-- новый ключ должен удержаться **несколько тиков подряд**
-- только после этого смена трека считается подтверждённой
-
-Это защищает от:
-
-- морганий DOM
-- промежуточных состояний плеера
-- лишних ререндеров YouTube Music
+Uses stable key detection to avoid false triggers.
 
 ---
 
-# Установка / запуск
+# Installation / launch
 
-## Вариант: через Chrome DevTools
+## Option: via Chrome DevTools
 
-### 1. Открываю YouTube Music
+1. Open https://music.youtube.com
+2. Press F12
+3. Go to Console
+4. Paste toolkit code
 
-Перехожу на:
+Expected output:
 
-```text
-https://music.youtube.com/
 ```
 
----
-
-### 2. Открываю DevTools
-
-Нажимаю:
-
-```text
-F12
-```
-
-или
-
-```text
-Ctrl + Shift + I
-```
-
----
-
-### 3. Иду в Console
-
-Открываю вкладку:
-
-```text
-Console
-```
-
----
-
-### 4. Вставляю весь [toolkit-код](scripts/poll_chunks_hook.js)
-
-Просто вставляю мой скрипт целиком и жму Enter.
-
-Если всё ок — в консоли появляется сообщение:
-
-```text
 [YT] Clean toolkit v3 installed.
+
 ```
 
 ---
 
-# Типичный сценарий использования
+# Typical usage scenarios
 
-## Сценарий 1 — вручную
-
-Если я хочу просто быстро вытащить текущий трек:
+Manual:
 
 ```js
 ytMSE.list()
@@ -299,29 +220,14 @@ ytMSE.inspect()
 ytMSE.save()
 ```
 
----
-
-## Сценарий 2 — авто-сбор треков
-
-Если я хочу включить плейлист и дать инструменту самому сохранять:
+Auto:
 
 ```js
 ytAuto.start()
-```
-
-Потом просто листаю / слушаю / даю трекам переключаться.
-
-Когда закончил:
-
-```js
 ytAuto.stop()
 ```
 
----
-
-## Сценарий 3 — отладка
-
-Если нужно понять, что вообще происходит у плеера:
+Debug:
 
 ```js
 ytMSE.getMeta()
@@ -331,256 +237,68 @@ ytAuto.status()
 
 ---
 
-# Почему это полезно
+# Why this is useful
 
-## Преимущества такого подхода
-
-### Не нужен MITM / прокси
-
-Я не ломаюсь в TLS, не ставлю внешние сертификаты и не строю кривой сетевой перехват.
-
----
-
-### Работаю прямо на уровне плеера
-
-Я беру не "какие-то догадки по сети", а **реальный бинарный поток**, который уже идёт в `SourceBuffer`.
+- No MITM
+- Works at player level
+- No dependencies
+- Great for research/debugging
 
 ---
 
-### Минимум внешних зависимостей
+# Limitations
 
-Всё работает **внутри DevTools**, без расширения, сборки, npm-пакетов и отдельного приложения.
-
----
-
-### Удобно для исследования YouTube Music
-
-Этот toolkit полезен не только для сохранения, но и для:
-
-- анализа поведения MSE
-- изучения буферизации
-- исследования структуры проигрывания
-- дебага смены треков
-- диагностики `blob:`-источников
-
----
-
-# Ограничения
-
-## 1) Это не "магический универсальный загрузчик"
-
-Инструмент завязан на то, **как YouTube Music сейчас реализует проигрывание**.
-
-Если сайт поменяет:
-
-- DOM player bar
-- способ сборки byline
-- MSE-логику
-- формат буферов
-
-— что-то может потребовать правки.
-
----
-
-## 2) Возможны дубли / лишние сессии
-
-YouTube Music иногда создаёт новые `SourceBuffer` не совсем так, как ожидается "по-человечески", поэтому в некоторых случаях можно увидеть несколько сессий на один и тот же трек.
-
-Я уже добавил логику отбора **лучшей предыдущей завершённой аудио-сессии**, но это всё равно важно понимать.
-
----
-
-## 3) Это инструмент для технического исследования
-
-Я писал это как **технический DevTools toolkit**, а не как polished user-facing extension с красивой UI-обвязкой.
+- Depends on YouTube implementation
+- Possible duplicate sessions
+- Not a polished UI tool
 
 ---
 
 # Dev Notes
 
-## Почему я замораживаю meta при создании session
-
-Это один из ключевых моментов.
-
-Если брать `title` / `artist` в момент сохранения, то есть шанс, что UI уже показывает **следующий трек**, а буфер у меня ещё относится к **предыдущему**.
-
-Поэтому я сохраняю `createdMeta` **в момент создания SourceBuffer**, а не в момент скачивания.
-
-Именно это даёт корректные имена файлов и нормальную привязку чанков к треку.
-
----
-
-## Почему я сохраняю не "самую новую" session, а "лучшую предыдущую"
-
-При автосохранении я не беру слепо последнюю сессию.
-
-Я специально ищу:
-
-> **самую большую завершённую предыдущую аудио-сессию**
-
-Это сильно снижает шанс сохранить:
-
-- обрубок следующего трека
-- недописанный буфер
-- мусорную короткую сессию
-- промежуточный аудио-переход
-
----
-
-## Почему тут нет UI
-
-Потому что сначала мне нужна была **чистая рабочая логика**, а не декоративная обвязка.
-
-Сначала я хотел:
-
-- надёжно перехватывать
-- надёжно определять трек
-- надёжно сохранять
-- и только потом уже думать про extension / overlay / панель
+- Meta frozen at session creation
+- Saves best previous session
+- No UI by design
 
 ---
 
 # Troubleshooting
 
-## Не появляется `[YT] Clean toolkit v3 installed.`
+Common issues:
 
-Проверь:
-
-- что код вставлен **целиком**
-- что ты находишься именно на:
-  ```text
-  https://music.youtube.com/
-  ```
-- что в консоли нет синтаксической ошибки выше
+- no install message → check script
+- empty sessions → wait buffering
+- corrupted files → increase threshold
 
 ---
 
-## `ytMSE.list()` пустой
+# Future ideas
 
-Возможные причины:
-
-- ты вставил toolkit **до старта воспроизведения**
-- трек ещё не начал реально буферизоваться
-- YouTube Music ещё не создал `SourceBuffer`
-
-Что делать:
-
-1. обновить страницу
-2. снова вставить toolkit
-3. запустить трек
-4. подождать 2–5 секунд
-5. снова вызвать:
-
-```js
-ytMSE.list()
-```
+- better filtering
+- UI panel
+- JSON export
+- full track detection
+- Chrome extension wrapper
 
 ---
 
-## Сохраняется слишком маленький / битый файл
-
-Попробуй увеличить порог:
-
-```js
-ytAuto.setMinBytes(500000)
-```
-
-или даже:
-
-```js
-ytAuto.setMinBytes(1000000)
-```
-
-Это особенно полезно, если YouTube Music создаёт короткие промежуточные аудио-сессии.
-
----
-
-## Автосохранение срабатывает не так, как ожидается
-
-Возможные причины:
-
-- DOM плеера обновляется нестабильно
-- byline/title обновляются раньше или позже аудио
-- YouTube Music пересоздаёт буферы нестандартно
-
-Что можно попробовать:
-
-- уменьшить/увеличить интервал авто-опроса
-- чаще смотреть `ytAuto.status()`
-- смотреть `ytMSE.inspect()`
-- логировать больше промежуточных состояний
-
----
-
-## В имени файла не тот артист / не тот трек
-
-Скорее всего это как раз один из пограничных случаев смены UI/буфера.
-
-Для анализа проверь:
-
-```js
-ytMSE.inspect()
-ytMSE.getMeta()
-ytAuto.status()
-```
-
----
-
-# Дальнейшие идеи развития
-
-Если я продолжу развивать этот toolkit, я бы добавил:
-
-- [ ] фильтрацию только реально полезных аудио-сессий
-- [ ] UI-панель прямо в странице
-- [ ] экспорт session history в JSON
-- [ ] авто-детект "полностью завершённого" трека
-- [ ] отдельное различение audio/video SourceBuffer
-- [ ] hook на `fetch` / `XMLHttpRequest` для дополнительного сопоставления сетевых запросов
-- [ ] связку с DevTools Snippets
-- [ ] поддержку YouTube (не только YouTube Music)
-- [ ] нормальный Chrome Extension wrapper
-- [ ] кнопку "сохранить текущий трек"
-- [ ] live-индикатор текущей активной session
-- [ ] экспорт технички для reverse/debug анализа
-
----
-
-# Быстрый старт
+# Quick start
 
 ```js
 ytAuto.start()
 ```
 
-Послушал музыку / полистал треки / дал им переключиться.
-
-Потом:
+Stop:
 
 ```js
 ytAuto.stop()
 ```
-
-Или вручную:
-
-```js
-ytMSE.save()
-```
-
-> Полный список [команд](docs/COMMANDS.md)
 
 ---
 
 # Disclaimer
 
 > [!CAUTION]
-> Этот проект публикуется как **технический исследовательский toolkit** для изучения поведения **MSE / SourceBuffer / runtime media pipelines** в браузере.
+> This project is a **technical research toolkit** for studying MSE, SourceBuffer, and browser media pipelines.
 >
-> Авторская цель проекта:
->
-> - исследование поведения проигрывателя,
-> - отладка и анализ буферизации,
-> - технический runtime-debug,
-> - reverse / browser instrumentation.
->
-> Если вы используете этот код, вы делаете это **на свой страх и риск** и **под свою ответственность**.
-
----
+> Use at your own risk.
